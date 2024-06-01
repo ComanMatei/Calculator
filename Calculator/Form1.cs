@@ -13,31 +13,56 @@ namespace Calculator
     public partial class Calculator : Form
     {
 
-        private Rectangle num1BtnRectangle;
-        private Rectangle num2BtnRectangle;
-        private Rectangle num3BtnRectangle;
-        private Rectangle num4BtnRectangle;
-        private Rectangle num5BtnRectangle;
-        private Rectangle num6BtnRectangle;
-        private Rectangle num7BtnRectangle;
-        private Rectangle num8BtnRectangle;
-        private Rectangle num9BtnRectangle;
-        private Rectangle zeroBtnRectangle;
+        float firstNum, secondNum, result;
+        char operation;
+        bool dec = false;
+        List<string> calculationHistory = new List<string>();
+        string calculation;
 
-        private Rectangle plusBtnRectangle;
-        private Rectangle minusBtnRectangle;
-        private Rectangle multiplyBtnRectangle;
-        private Rectangle divideBtnRectangle;
+        private void AddToHistory(string calculation)
+        {
+            calculationHistory.Add(calculation);
+        }
 
-        private Rectangle decimalBtnRectangle;
-        private Rectangle plusMinusBtnRectangle;
+        private string[] GetHistory()
+        {
+            return calculationHistory.ToArray();
+        }
 
-        private Rectangle equalBtnRectangle;
-        private Rectangle clearBtnRectangle;
-
-        private Rectangle displayLabelRectangle;
-
-        private Size originalFormSize;
+        private void changeLebel(int numPressed)
+        {
+            if (dec == true)
+            {
+                int decimalCount = 0;
+                foreach (char c in displayLabel.Text)
+                {
+                    if (c == '.')
+                    {
+                        decimalCount++;
+                    }
+                }
+                if (decimalCount < 1)
+                {
+                    displayLabel.Text = displayLabel.Text + ".";
+                }
+                dec = false;
+            }
+            else
+            {
+                if (displayLabel.Text.Equals("0") == true && displayLabel.Text != null)
+                {
+                    displayLabel.Text = numPressed.ToString();
+                }
+                else if (displayLabel.Text.Equals("-0") == true)
+                {
+                    displayLabel.Text = "-" + numPressed.ToString();
+                }
+                else
+                {
+                    displayLabel.Text = displayLabel.Text + numPressed.ToString();
+                }
+            }
+        }
 
         public Calculator()
         {
@@ -46,163 +71,175 @@ namespace Calculator
 
         private void Calculator_Load(object sender, EventArgs e)
         {
-            originalFormSize = this.Size;
-            num1BtnRectangle = new Rectangle(num1.Location.X, num1.Location.Y, num1.Width, num1.Height);
-            num2BtnRectangle = new Rectangle(num2.Location.X, num2.Location.Y, num2.Width, num2.Height);
-            num3BtnRectangle = new Rectangle(num3.Location.X, num3.Location.Y, num3.Width, num3.Height);
-            num4BtnRectangle = new Rectangle(num4.Location.X, num4.Location.Y, num4.Width, num4.Height);
-            num5BtnRectangle = new Rectangle(num5.Location.X, num5.Location.Y, num5.Width, num5.Height);
-            num6BtnRectangle = new Rectangle(num6.Location.X, num6.Location.Y, num6.Width, num6.Height);
-            num7BtnRectangle = new Rectangle(num7.Location.X, num7.Location.Y, num7.Width, num7.Height);
-            num8BtnRectangle = new Rectangle(num8.Location.X, num8.Location.Y, num8.Width, num8.Height);
-            num9BtnRectangle = new Rectangle(num9.Location.X, num9.Location.Y, num9.Width, num9.Height);
-            zeroBtnRectangle = new Rectangle(zeroBtn.Location.X, zeroBtn.Location.Y, zeroBtn.Width, zeroBtn.Height);
-
-            plusBtnRectangle = new Rectangle(plusBtn.Location.X, plusBtn.Location.Y, plusBtn.Width, plusBtn.Height);
-            minusBtnRectangle = new Rectangle(minusBtn.Location.X, minusBtn.Location.Y, minusBtn.Width, minusBtn.Height);
-            multiplyBtnRectangle = new Rectangle(multiplyBtn.Location.X, multiplyBtn.Location.Y, multiplyBtn.Width, multiplyBtn.Height);
-            divideBtnRectangle = new Rectangle(divideBtn.Location.X, divideBtn.Location.Y, divideBtn.Width, divideBtn.Height);
-
-            decimalBtnRectangle = new Rectangle(decimalBtn.Location.X, decimalBtn.Location.Y, decimalBtn.Width, decimalBtn.Height);
-            plusMinusBtnRectangle = new Rectangle(plusMinusBtn.Location.X, plusMinusBtn.Location.Y, plusMinusBtn.Width, plusMinusBtn.Height);
-
-            equalBtnRectangle = new Rectangle(equalBtn.Location.X, equalBtn.Location.Y, equalBtn.Width, equalBtn.Height);
-            clearBtnRectangle = new Rectangle(clearBtn.Location.X, clearBtn.Location.Y, clearBtn.Width, clearBtn.Height);
-
-            displayLabelRectangle = new Rectangle(displayLabel.Location.X, displayLabel.Location.Y, displayLabel.Width, displayLabel.Height);
-
-        }
-
-        private void Calculator_Resize(object sender, EventArgs e)
-        {
-            resizeControl(num1BtnRectangle, num1);
-            resizeControl(num2BtnRectangle, num2);
-            resizeControl(num3BtnRectangle, num3);
-            resizeControl(num4BtnRectangle, num4);
-            resizeControl(num5BtnRectangle, num5);
-            resizeControl(num6BtnRectangle, num6);
-            resizeControl(num7BtnRectangle, num7);
-            resizeControl(num8BtnRectangle, num8);
-            resizeControl(num9BtnRectangle, num9);
-            resizeControl(zeroBtnRectangle, zeroBtn);
-
-            resizeControl(plusBtnRectangle, plusBtn);
-            resizeControl(minusBtnRectangle, minusBtn);
-            resizeControl(multiplyBtnRectangle, multiplyBtn);
-            resizeControl(divideBtnRectangle, divideBtn);
-
-            resizeControl(decimalBtnRectangle, decimalBtn);
-            resizeControl(plusMinusBtnRectangle, plusMinusBtn);
-
-            resizeControl(equalBtnRectangle, equalBtn);
-            resizeControl(clearBtnRectangle, clearBtn);
-
-            resizeControl(displayLabelRectangle, displayLabel);
-        }
-
-        private void resizeControl(Rectangle OriginalControlRectangle, Control control)
-        {
-            float xAxis = (float)(this.Width) / (float)(originalFormSize.Width);
-            float yAxis = (float)(this.Height) / (float)(originalFormSize.Height);
-
-            int newXPosition = (int)(OriginalControlRectangle.X * xAxis);
-            int newYPosition = (int)(OriginalControlRectangle.Y * yAxis);
-
-            int newWidth = (int)(originalFormSize.Width * xAxis);
-            int newHeight = (int)(originalFormSize.Height * yAxis);
-
-            control.Location = new Point(newXPosition, newYPosition);
-            control.Size = new Size(newWidth, newHeight);
         }
 
         private void num1_Click(object sender, EventArgs e)
         {
-
+            changeLebel(1);
         }
 
         private void num2_Click(object sender, EventArgs e)
         {
-
+            changeLebel(2);
         }
 
         private void num3_Click(object sender, EventArgs e)
         {
-
+            changeLebel(3);
         }
 
         private void num4_Click(object sender, EventArgs e)
         {
-
+            changeLebel(4);
         }
 
         private void num5_Click(object sender, EventArgs e)
         {
-
+            changeLebel(5);
         }
 
         private void num6_Click(object sender, EventArgs e)
         {
-
+            changeLebel(6);
         }
 
         private void num7_Click(object sender, EventArgs e)
         {
-
+            changeLebel(7);
         }
 
         private void num8_Click(object sender, EventArgs e)
         {
-
+            changeLebel(8);
         }
 
         private void num9_Click(object sender, EventArgs e)
         {
-
+            changeLebel(9);
         }
 
         private void zeroBtn_Click(object sender, EventArgs e)
         {
-
+            changeLebel(0);
         }
 
         private void clearBtn_Click(object sender, EventArgs e)
         {
-
+            displayLabel.Text = "0";
+            firstNum = 0;
+            secondNum = 0;
+            result = 0;
+            operation = '\0';
+            dec = false;
         }
 
         private void equalBtn_Click(object sender, EventArgs e)
         {
+            result = 0;
+            if (displayLabel.Text.Equals("0") == false)
+            {
+                switch (operation)
+                {
+                    case '+':
+                        secondNum = float.Parse(displayLabel.Text);
+                        result = firstNum + secondNum;
 
+                        calculation = firstNum.ToString() + " + " + secondNum.ToString() + " = " + result.ToString();
+                        break;
+                    case '-':
+                        secondNum = float.Parse(displayLabel.Text);
+                        result = firstNum - secondNum;
+
+                        calculation = firstNum.ToString() + " - " + secondNum.ToString() + " = " + result.ToString();
+                        break;
+                    case '/':
+                        secondNum = float.Parse(displayLabel.Text);
+                        result = firstNum / secondNum;
+
+                        calculation = firstNum.ToString() + " / " + secondNum.ToString() + " = " + result.ToString();
+                        break;
+                    case '*':
+                        secondNum = float.Parse(displayLabel.Text);
+                        result = firstNum * secondNum;
+
+                        calculation = firstNum.ToString() + " * " + secondNum.ToString() + " = " + result.ToString();
+                        break;
+                    default:
+                        break;
+                }
+                calculationHistory.Add(calculation);
+                foreach (string calculation in calculationHistory)
+                {
+                    Console.WriteLine(calculation);
+                }
+            }
+            displayLabel.Text = result.ToString();
         }
 
         private void plusBtn_Click(object sender, EventArgs e)
         {
-
+            firstNum = float.Parse(displayLabel.Text);
+            operation = '+';
+            result = result + firstNum;
+            displayLabel.Text = "";
         }
 
         private void minusBtn_Click(object sender, EventArgs e)
         {
-
+            firstNum = float.Parse(displayLabel.Text);
+            operation = '-';
+            result = result - firstNum;
+            displayLabel.Text = "";
         }
 
         private void multiplyBtn_Click(object sender, EventArgs e)
         {
-
+            firstNum = float.Parse(displayLabel.Text);
+            operation = '*';
+            result = result * firstNum;
+            displayLabel.Text = "";
         }
 
         private void devideBtn_Click(object sender, EventArgs e)
         {
+            firstNum = float.Parse(displayLabel.Text);
+            operation = '/';
+            result = result / firstNum;
+            displayLabel.Text = "";
+        }
 
+        private void backspaceBtn_Click(object sender, EventArgs e)
+        {
+            int stringLength = displayLabel.Text.Length;
+            if (stringLength > 1)
+            {
+                displayLabel.Text = displayLabel.Text.Substring(0, stringLength - 1);
+            }
+            else
+            {
+                displayLabel.Text = "0";
+            }
+        }
+
+        private void history_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            
+            HistoryForm historyForm = new HistoryForm(calculationHistory);
+            historyForm.ShowDialog();
+
+            this.Show();
         }
 
         private void decimalBtn_Click(object sender, EventArgs e)
         {
-
+            dec = true;
+            changeLebel(0);
         }
 
         private void plusMinusBtn_Click(object sender, EventArgs e)
         {
-
+            displayLabel.Text = "-" + displayLabel.Text;
         }
     }
 }
